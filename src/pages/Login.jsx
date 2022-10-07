@@ -1,5 +1,7 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import PropTypes from 'prop-types';
+import { Redirect, Link } from 'react-router-dom';
+import fetchAPI from '../redux/actions';
 
 const { connect } = require('react-redux');
 
@@ -8,12 +10,8 @@ class Login extends React.Component {
     btnDisable: true,
     name: '',
     email: '',
+    redirect: false,
   };
-
-  // handleClick = () => {
-  //   const { history } = this.props;
-  //   history.push('/config');
-  // };
 
   handleChange = ({ target }) => {
     const { name, value } = target;
@@ -25,10 +23,19 @@ class Login extends React.Component {
     this.setState({ btnDisable: !(name.length > 0 && email.length > 0) });
   };
 
+  handleClick = () => {
+    const { dispatch } = this.props;
+    dispatch(fetchAPI());
+    this.setState({
+      redirect: true,
+    });
+  };
+
   render() {
-    const { btnDisable, name, email } = this.state;
+    const { btnDisable, name, email, redirect } = this.state;
     return (
       <section>
+        {redirect && <Redirect to="/play" />}
         <h1>Login</h1>
         <form>
           <label htmlFor="name">
@@ -53,17 +60,15 @@ class Login extends React.Component {
             type="button"
             data-testid="btn-play"
             disabled={ btnDisable }
+            onClick={ this.handleClick }
           >
             Play
           </button>
-
           <Link to="/config">
             <button
               type="button"
               data-testid="btn-settings"
-            // onClick={ this.handleClick }
             >
-
               Configurações
             </button>
           </Link>
@@ -72,5 +77,9 @@ class Login extends React.Component {
     );
   }
 }
+
+Login.propTypes = {
+  dispatch: PropTypes.func.isRequired,
+};
 
 export default connect()(Login);
