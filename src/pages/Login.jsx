@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Redirect } from 'react-router-dom';
 import fetchAPI from '../redux/actions';
+import { Link } from 'react-router-dom';
 
 const { connect } = require('react-redux');
 
@@ -64,9 +65,14 @@ class Login extends React.Component {
           >
             Play
           </button>
-          <button type="button">
-            Configurações
-          </button>
+          <Link to="/config">
+            <button
+              type="button"
+              data-testid="btn-settings"
+            >
+              Configurações
+            </button>
+          </Link>
         </form>
       </section>
     );
