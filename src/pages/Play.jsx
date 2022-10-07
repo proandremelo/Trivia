@@ -1,13 +1,13 @@
-import React, {Component} from "react";
+import React, { Component } from 'react';
 
 class Play extends Component {
-    render() {
-        return(
-            <div>
-                play
-            </div>
-        );
-    }
+  render() {
+    return (
+      <div>
+        play
+      </div>
+    );
+  }
 }
 
 export default Play;
