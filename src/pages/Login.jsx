@@ -48,6 +48,7 @@ class Login extends React.Component {
             <input
               type="text"
               name="name"
+              placeholder="insira seu nome"
               data-testid="input-player-name"
               value={ name }
               onChange={ this.handleChange }
@@ -57,6 +58,7 @@ class Login extends React.Component {
             <input
               type="text"
               name="email"
+              placeholder="insira seu email"
               data-testid="input-gravatar-email"
               value={ email }
               onChange={ this.handleChange }
