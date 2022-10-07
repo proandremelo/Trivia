@@ -1,8 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Redirect } from 'react-router-dom';
+import { Redirect, Link } from 'react-router-dom';
 import fetchAPI from '../redux/actions';
-import { Link } from 'react-router-dom';
 
 const { connect } = require('react-redux');
 
