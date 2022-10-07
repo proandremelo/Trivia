@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 const { connect } = require('react-redux');
 
@@ -8,6 +9,11 @@ class Login extends React.Component {
     name: '',
     email: '',
   };
+
+  // handleClick = () => {
+  //   const { history } = this.props;
+  //   history.push('/config');
+  // };
 
   handleChange = ({ target }) => {
     const { name, value } = target;
@@ -50,9 +56,17 @@ class Login extends React.Component {
           >
             Play
           </button>
-          <button type="button">
-            Configurações
-          </button>
+
+          <Link to="/config">
+            <button
+              type="button"
+              data-testid="btn-settings"
+            // onClick={ this.handleClick }
+            >
+
+              Configurações
+            </button>
+          </Link>
         </form>
       </section>
     );
