@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Redirect, Link } from 'react-router-dom';
-import { addUserInfo, fetchAPI, triviaAPI } from '../redux/actions';
+import { Link } from 'react-router-dom';
+import { addUserInfo, fetchAPI } from '../redux/actions';
 
 const { connect } = require('react-redux');
 
@@ -10,7 +10,6 @@ class Login extends React.Component {
     btnDisable: true,
     name: '',
     email: '',
-    redirect: false,
   };
 
   handleChange = ({ target }) => {
@@ -37,14 +36,13 @@ class Login extends React.Component {
     // this.setState({
     //   redirect: true,
     // });
-    history.push("/game")
+    history.push('/game');
   };
 
   render() {
-    const { btnDisable, name, email, redirect } = this.state;
+    const { btnDisable, name, email } = this.state;
     return (
       <section>
-        {/* {redirect && <Redirect to="/game" />} */}
         <h1>Login</h1>
         <form>
           <label htmlFor="name">
@@ -88,11 +86,14 @@ class Login extends React.Component {
 }
 
 Login.propTypes = {
+  history: PropTypes.shape({
+    push: PropTypes.func.isRequired,
+  }).isRequired,
   dispatch: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = (state) => ({
-  isInvalid: state.perguntasReducer.isInvalid
+  isInvalid: state.perguntasReducer.isInvalid,
 });
 
 export default connect(mapStateToProps)(Login);
