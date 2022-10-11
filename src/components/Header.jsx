@@ -1,11 +1,11 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { MD5 } from 'crypto-js';
-import { string } from 'prop-types';
+import { number, string } from 'prop-types';
 
 class Header extends React.Component {
   render() {
-    const { name, email } = this.props;
+    const { name, email, score } = this.props;
     const site = 'https://www.gravatar.com/avatar/';
     const src = `${site}${MD5(email).toString()}`;
     return (
@@ -23,7 +23,7 @@ class Header extends React.Component {
         <span
           data-testid="header-score"
         >
-          0
+          { score }
         </span>
       </section>
     );
@@ -33,11 +33,13 @@ class Header extends React.Component {
 const mapStateToProps = (state) => ({
   name: state.user.name,
   email: state.user.gravatarEmail,
+  score: state.user.score,
 });
 
 Header.propTypes = {
   name: string.isRequired,
   email: string.isRequired,
+  score: number.isRequired,
 };
 
 export default connect(mapStateToProps)(Header);

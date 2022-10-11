@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Redirect, Link } from 'react-router-dom';
-import { addUserInfo, fetchAPI } from '../redux/actions';
+import { Link } from 'react-router-dom';
+import { addUserInfo } from '../redux/actions';
 
 const { connect } = require('react-redux');
 
@@ -10,7 +10,6 @@ class Login extends React.Component {
     btnDisable: true,
     name: '',
     email: '',
-    redirect: false,
   };
 
   handleChange = ({ target }) => {
@@ -23,25 +22,38 @@ class Login extends React.Component {
     this.setState({ btnDisable: !(name.length > 0 && email.length > 0) });
   };
 
-  handleClick = () => {
-    const { dispatch } = this.props;
+  fetchAPI = async () => {
+    try {
+      const tokenRequest = 'https://opentdb.com/api_token.php?command=request';
+      const request = await fetch(tokenRequest);
+      const resposta = await request.json();
+      localStorage.setItem('token', resposta.token);
+    } catch (error) {
+      return error;
+    }
+  };
+
+  handleClick = async () => {
+    const { dispatch, history } = this.props;
     const { name, email } = this.state;
     const info = {
       name,
       email,
     };
     dispatch(addUserInfo(info));
-    dispatch(fetchAPI());
-    this.setState({
-      redirect: true,
-    });
+    await this.fetchAPI();
+    // const token = JSON.parse(localStorage.getItem('token'));
+    // dispatch(triviaAPI(token));
+    // this.setState({
+    //   redirect: true,
+    // });
+    history.push('/game');
   };
 
   render() {
-    const { btnDisable, name, email, redirect } = this.state;
+    const { btnDisable, name, email } = this.state;
     return (
       <section>
-        {redirect && <Redirect to="/game" />}
         <h1>Login</h1>
         <form>
           <label htmlFor="name">
@@ -87,6 +99,9 @@ class Login extends React.Component {
 }
 
 Login.propTypes = {
+  history: PropTypes.shape({
+    push: PropTypes.func.isRequired,
+  }).isRequired,
   dispatch: PropTypes.func.isRequired,
 };
 

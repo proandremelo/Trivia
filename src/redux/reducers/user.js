@@ -3,7 +3,7 @@ import { ADD_USER_INFO } from '../actions/actionTypes';
 const INITIAL_STATE = {
   name: '', // nome-da-pessoa,
   assertions: '', // número-de-acertos,
-  score: '', // pontuação,
+  score: 0, // pontuação,
   gravatarEmail: '', // email-da-pessoa,
 };
 
