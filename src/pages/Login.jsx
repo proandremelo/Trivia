@@ -22,7 +22,19 @@ class Login extends React.Component {
     this.setState({ btnDisable: !(name.length > 0 && email.length > 0) });
   };
 
-  handleClick = () => {
+  fetchAPI = async () => {
+    try {
+      const tokenRequest = 'https://opentdb.com/api_token.php?command=request';
+      const request = await fetch(tokenRequest);
+      const resposta = await request.json();
+      localStorage.setItem('token', resposta.token);
+    } catch (error) {
+      return error;
+    }
+  };
+  
+
+  handleClick = async () => {
     const { dispatch, history } = this.props;
     const { name, email } = this.state;
     const info = {
@@ -30,7 +42,7 @@ class Login extends React.Component {
       email,
     };
     dispatch(addUserInfo(info));
-    dispatch(fetchAPI());
+    await this.fetchAPI();
     // const token = JSON.parse(localStorage.getItem('token'));
     // dispatch(triviaAPI(token));
     // this.setState({
@@ -92,8 +104,6 @@ Login.propTypes = {
   dispatch: PropTypes.func.isRequired,
 };
 
-const mapStateToProps = (state) => ({
-  isInvalid: state.perguntasReducer.isInvalid,
-});
 
-export default connect(mapStateToProps)(Login);
+
+export default connect()(Login);

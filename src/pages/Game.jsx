@@ -8,27 +8,58 @@ import Header from '../components/Header';
 class Play extends Component {
   state = {
     indexQuestao: 0,
+    perguntas: [],
   };
 
-  componentDidMount() {
-    const { dispatch } = this.props;
-    const token = JSON.parse(localStorage.getItem('token'));
-    dispatch(triviaAPI(token));
+ async componentDidMount() {
+    const token = localStorage.getItem('token');
+    await this.triviaAPI(token);
   }
 
-  removeItem = () => {
+  triviaAPI = async (token) => {
     const { history } = this.props;
-    localStorage.removeItem('token');
-    history.push('/');
+    try {
+      const url = `https://opentdb.com/api.php?amount=5&token=${token}`;
+      const request = await fetch(url);
+      const resposta = await request.json();
+      if (resposta.response_code === 3) {
+        localStorage.removeItem('token');
+        history.push('/');
+      } 
+        this.setState({
+          perguntas: resposta.results,
+      })
+    } catch (error) {
+      return error;
+    }
   };
 
+  //função retirada diretamente do stack overflow
+  //https://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
+  
+   shuffle = (array) => {
+    let currentIndex = array.length, randomIndex;
+    
+    // While there remain elements to shuffle.
+    while (currentIndex != 0) {
+    
+    // Pick a remaining element.
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex--;
+    
+    // And swap it with the current element.
+    [array[currentIndex], array[randomIndex]] = [
+    array[randomIndex], array[currentIndex]];
+    }
+    
+    return array;
+    }
+
   render() {
-    const { isInvalid, perguntas } = this.props;
-    const { indexQuestao } = this.state;
+    const { indexQuestao, perguntas } = this.state;
     console.log(perguntas);
     return (
       <div>
-        { isInvalid && this.removeItem() }
         <Header />
         { perguntas.length > 0 && (
           <div>
@@ -36,8 +67,8 @@ class Play extends Component {
             <h3 data-testid="question-text">{perguntas[indexQuestao].question}</h3>
             <div data-testid="answer-options">
               {
-                [perguntas[indexQuestao].correct_answer, ...perguntas[indexQuestao]
-                  .incorrect_answers].sort().map((elem, index) => (
+                this.shuffle([perguntas[indexQuestao].correct_answer, ...perguntas[indexQuestao]
+                  .incorrect_answers]).map((elem, index) => (
                   (elem === perguntas[indexQuestao].correct_answer)
                     ? (
                       <button data-testid="correct-answer" key={ index } type="button">
@@ -64,22 +95,10 @@ class Play extends Component {
 }
 
 Play.propTypes = {
-  perguntas: PropTypes.arrayOf(PropTypes.shape({
-    category: PropTypes.string.isRequired,
-    question: PropTypes.string.isRequired,
-    correct_answer: PropTypes.string.isRequired,
-    incorrect_answers: PropTypes.arrayOf(PropTypes.string).isRequired,
-  })).isRequired,
-  isInvalid: PropTypes.bool.isRequired,
   dispatch: PropTypes.func.isRequired,
   history: PropTypes.shape({
     push: PropTypes.func.isRequired,
   }).isRequired,
 };
 
-const mapStateToProps = (state) => ({
-  perguntas: state.perguntasReducer.perguntas,
-  isInvalid: state.perguntasReducer.isInvalid,
-});
-
-export default connect(mapStateToProps)(Play);
+export default connect()(Play);
