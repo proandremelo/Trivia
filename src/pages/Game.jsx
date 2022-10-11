@@ -8,6 +8,8 @@ class Play extends Component {
   state = {
     indexQuestao: 0,
     perguntas: [],
+    verified: false,
+    // random: [],
   };
 
   async componentDidMount() {
@@ -55,8 +57,18 @@ class Play extends Component {
     return array;
   };
 
+  randomArray = (perguntas, indexQuestao) => {
+    const random = this.shuffle([perguntas[indexQuestao].correct_answer,
+      ...perguntas[indexQuestao].incorrect_answers]);
+    return random;
+  };
+
+  clickQuestion = () => {
+    this.setState({ verified: true });
+  };
+
   render() {
-    const { indexQuestao, perguntas } = this.state;
+    const { indexQuestao, perguntas, verified } = this.state;
     return (
       <div>
         <Header />
@@ -66,11 +78,18 @@ class Play extends Component {
             <h3 data-testid="question-text">{perguntas[indexQuestao].question}</h3>
             <div data-testid="answer-options">
               {
-                this.shuffle([perguntas[indexQuestao].correct_answer,
-                  ...perguntas[indexQuestao].incorrect_answers]).map((elem, index) => (
+                this.randomArray(perguntas, indexQuestao).map((elem, index) => (
                   (elem === perguntas[indexQuestao].correct_answer)
                     ? (
-                      <button data-testid="correct-answer" key={ index } type="button">
+                      <button
+                        data-testid="correct-answer"
+                        key={ index }
+                        type="button"
+                        onClick={ this.clickQuestion }
+                        value="correct-answer"
+                        style={ verified ? {
+                          border: '3px solid rgb(6, 240, 15)' } : {} }
+                      >
                         {elem}
                       </button>
                     )
@@ -79,6 +98,10 @@ class Play extends Component {
                         data-testid={ `wrong-answer-${index}` }
                         key={ index }
                         type="button"
+                        onClick={ this.clickQuestion }
+                        value="wrong-answer"
+                        style={ verified ? {
+                          border: '3px solid red' } : {} }
                       >
                         {elem}
                       </button>
