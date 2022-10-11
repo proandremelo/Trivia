@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
-import { addUserInfo, fetchAPI } from '../redux/actions';
+import { addUserInfo } from '../redux/actions';
 
 const { connect } = require('react-redux');
 
@@ -32,7 +32,6 @@ class Login extends React.Component {
       return error;
     }
   };
-  
 
   handleClick = async () => {
     const { dispatch, history } = this.props;
@@ -103,7 +102,5 @@ Login.propTypes = {
   }).isRequired,
   dispatch: PropTypes.func.isRequired,
 };
-
-
 
 export default connect()(Login);
