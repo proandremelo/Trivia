@@ -1,4 +1,4 @@
-import { ADD_USER_INFO } from '../actions/actionTypes';
+import { ADD_USER_INFO, ADD_SCORE } from '../actions/actionTypes';
 
 const INITIAL_STATE = {
   name: '', // nome-da-pessoa,
@@ -14,6 +14,11 @@ const user = (state = INITIAL_STATE, action) => {
       ...state,
       name: action.info.name,
       gravatarEmail: action.info.email,
+    };
+  case ADD_SCORE:
+    return {
+      ...state,
+      score: state.score + action.placar,
     };
   default:
     return state;

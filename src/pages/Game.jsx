@@ -3,9 +3,14 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
 import Header from '../components/Header';
+import { addPlacar } from '../redux/actions';
 
 const GAME_TIME = 30;
 const ONE_SECOND = 1000;
+const PONTO_CONSTANTE = 10;
+const HARD = 3;
+const MEDIUM = 2;
+const EASY = 1;
 
 class Play extends Component {
   state = {
@@ -91,7 +96,6 @@ class Play extends Component {
 
   randomArray = (perguntas, indexQuestao) => {
     const { verifyRandom } = this.state;
-    console.log(verifyRandom);
     if (verifyRandom) {
       const random = this.shuffle([perguntas[indexQuestao].correct_answer,
         ...perguntas[indexQuestao].incorrect_answers]);
@@ -101,11 +105,30 @@ class Play extends Component {
       ...perguntas[indexQuestao].incorrect_answers];
   };
 
-  clickQuestion = () => {
+  somaPlacar = () => {
+    const { time, perguntas, indexQuestao } = this.state;
+    const { difficulty } = perguntas[indexQuestao];
+    if (difficulty === 'hard') {
+      return PONTO_CONSTANTE + (time * HARD);
+    }
+    if (difficulty === 'medium') {
+      return PONTO_CONSTANTE + (time * MEDIUM);
+    }
+    if (difficulty === 'easy') {
+      return PONTO_CONSTANTE + (time * EASY);
+    }
+  };
+
+  clickQuestion = ({ target }) => {
     const { clock } = this.state;
+    const { dispatch } = this.props;
     this.randomTrue();
     this.setState({ verified: true, disableBtns: true });
     clearInterval(clock);
+    if (target.value === 'correct-answer') {
+      const placar = this.somaPlacar();
+      dispatch(addPlacar(placar));
+    }
   };
 
   render() {
@@ -161,6 +184,7 @@ class Play extends Component {
 }
 
 Play.propTypes = {
+  dispatch: PropTypes.func.isRequired,
   history: PropTypes.shape({
     push: PropTypes.func.isRequired,
   }).isRequired,
