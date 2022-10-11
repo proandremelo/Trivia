@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Redirect, Link } from 'react-router-dom';
-import { addUserInfo, fetchAPI } from '../redux/actions';
+import fetchAPI from '../redux/actions';
 
 const { connect } = require('react-redux');
 
@@ -25,12 +25,6 @@ class Login extends React.Component {
 
   handleClick = () => {
     const { dispatch } = this.props;
-    const { name, email } = this.state;
-    const info = {
-      name,
-      email,
-    };
-    dispatch(addUserInfo(info));
     dispatch(fetchAPI());
     this.setState({
       redirect: true,
@@ -41,14 +35,13 @@ class Login extends React.Component {
     const { btnDisable, name, email, redirect } = this.state;
     return (
       <section>
-        {redirect && <Redirect to="/game" />}
+        {redirect && <Redirect to="/play" />}
         <h1>Login</h1>
         <form>
           <label htmlFor="name">
             <input
               type="text"
               name="name"
-              placeholder="insira seu nome"
               data-testid="input-player-name"
               value={ name }
               onChange={ this.handleChange }
@@ -58,7 +51,6 @@ class Login extends React.Component {
             <input
               type="text"
               name="email"
-              placeholder="insira seu email"
               data-testid="input-gravatar-email"
               value={ email }
               onChange={ this.handleChange }

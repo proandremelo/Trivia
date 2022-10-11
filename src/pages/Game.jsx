@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 
 import Header from '../components/Header';
 
-class Play extends Component {
+class Game extends Component {
   render() {
     return (
       <div>
@@ -12,4 +12,4 @@ class Play extends Component {
   }
 }
 
-export default Play;
+export default Game;
