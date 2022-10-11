@@ -4,18 +4,50 @@ import PropTypes from 'prop-types';
 
 import Header from '../components/Header';
 
+const GAME_TIME = 30;
+const ONE_SECOND = 1000;
+
 class Play extends Component {
   state = {
     indexQuestao: 0,
     perguntas: [],
     verified: false,
-    // random: [],
+    time: GAME_TIME,
+    verifyRandom: true,
+    clock: 0,
+    disableBtns: false,
   };
 
   async componentDidMount() {
     const token = localStorage.getItem('token');
     await this.triviaAPI(token);
+    this.createTimer();
   }
+
+  randomFalse = () => {
+    this.setState({ verifyRandom: false });
+  };
+
+  randomTrue = () => {
+    this.setState({ verifyRandom: true });
+  };
+
+  createTimer = () => {
+    const clock = setInterval(() => {
+      this.setState({ clock });
+      let { time } = this.state;
+      if (time > 0) {
+        this.randomFalse();
+        time -= 1;
+        this.setState({ time });
+      }
+      if (time <= 0) {
+        this.setState({ verified: true, disableBtns: true });
+        this.randomTrue();
+        clearInterval(clock);
+      }
+    }, ONE_SECOND);
+  };
 
   triviaAPI = async (token) => {
     const { history } = this.props;
@@ -58,20 +90,30 @@ class Play extends Component {
   };
 
   randomArray = (perguntas, indexQuestao) => {
-    const random = this.shuffle([perguntas[indexQuestao].correct_answer,
-      ...perguntas[indexQuestao].incorrect_answers]);
-    return random;
+    const { verifyRandom } = this.state;
+    console.log(verifyRandom);
+    if (verifyRandom) {
+      const random = this.shuffle([perguntas[indexQuestao].correct_answer,
+        ...perguntas[indexQuestao].incorrect_answers]);
+      return random;
+    }
+    return [perguntas[indexQuestao].correct_answer,
+      ...perguntas[indexQuestao].incorrect_answers];
   };
 
   clickQuestion = () => {
-    this.setState({ verified: true });
+    const { clock } = this.state;
+    this.randomTrue();
+    this.setState({ verified: true, disableBtns: true });
+    clearInterval(clock);
   };
 
   render() {
-    const { indexQuestao, perguntas, verified } = this.state;
+    const { indexQuestao, perguntas, verified, time, disableBtns } = this.state;
     return (
       <div>
         <Header />
+        <span>{ time }</span>
         { perguntas.length > 0 && (
           <div>
             <h1 data-testid="question-category">{perguntas[indexQuestao].category}</h1>
@@ -87,6 +129,7 @@ class Play extends Component {
                         type="button"
                         onClick={ this.clickQuestion }
                         value="correct-answer"
+                        disabled={ disableBtns }
                         style={ verified ? {
                           border: '3px solid rgb(6, 240, 15)' } : {} }
                       >
@@ -100,6 +143,7 @@ class Play extends Component {
                         type="button"
                         onClick={ this.clickQuestion }
                         value="wrong-answer"
+                        disabled={ disableBtns }
                         style={ verified ? {
                           border: '3px solid red' } : {} }
                       >
