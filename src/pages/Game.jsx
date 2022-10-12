@@ -3,9 +3,14 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
 import Header from '../components/Header';
+import { addPlacar } from '../redux/actions';
 
 const GAME_TIME = 30;
 const ONE_SECOND = 1000;
+const PONTO_CONSTANTE = 10;
+const HARD = 3;
+const MEDIUM = 2;
+const EASY = 1;
 
 class Play extends Component {
   state = {
@@ -13,7 +18,6 @@ class Play extends Component {
     perguntas: [],
     verified: false,
     time: GAME_TIME,
-    verifyRandom: true,
     clock: 0,
     disableBtns: false,
   };
@@ -24,26 +28,16 @@ class Play extends Component {
     this.createTimer();
   }
 
-  randomFalse = () => {
-    this.setState({ verifyRandom: false });
-  };
-
-  randomTrue = () => {
-    this.setState({ verifyRandom: true });
-  };
-
   createTimer = () => {
     const clock = setInterval(() => {
       this.setState({ clock });
       let { time } = this.state;
       if (time > 0) {
-        this.randomFalse();
         time -= 1;
         this.setState({ time });
       }
       if (time <= 0) {
         this.setState({ verified: true, disableBtns: true });
-        this.randomTrue();
         clearInterval(clock);
       }
     }, ONE_SECOND);
@@ -60,6 +54,10 @@ class Play extends Component {
         localStorage.removeItem('token');
         history.push('/');
       }
+      resposta.results.forEach((question) => {
+        question.respostas = this.randomArray(question);
+      });
+      console.log(resposta.results);
       this.setState({
         perguntas: resposta.results,
       });
@@ -72,8 +70,8 @@ class Play extends Component {
   // https://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
 
   shuffle = (array) => {
-    let currentIndex = array.length; let
-      randomIndex;
+    let currentIndex = array.length;
+    let randomIndex;
 
     // While there remain elements to shuffle.
     while (currentIndex !== 0) {
@@ -89,23 +87,32 @@ class Play extends Component {
     return array;
   };
 
-  randomArray = (perguntas, indexQuestao) => {
-    const { verifyRandom } = this.state;
-    console.log(verifyRandom);
-    if (verifyRandom) {
-      const random = this.shuffle([perguntas[indexQuestao].correct_answer,
-        ...perguntas[indexQuestao].incorrect_answers]);
-      return random;
+  randomArray = (pergunta) => this.shuffle([pergunta.correct_answer,
+    ...pergunta.incorrect_answers]);
+
+  somaPlacar = () => {
+    const { time, perguntas, indexQuestao } = this.state;
+    const { difficulty } = perguntas[indexQuestao];
+    if (difficulty === 'hard') {
+      return PONTO_CONSTANTE + (time * HARD);
     }
-    return [perguntas[indexQuestao].correct_answer,
-      ...perguntas[indexQuestao].incorrect_answers];
+    if (difficulty === 'medium') {
+      return PONTO_CONSTANTE + (time * MEDIUM);
+    }
+    if (difficulty === 'easy') {
+      return PONTO_CONSTANTE + (time * EASY);
+    }
   };
 
-  clickQuestion = () => {
+  clickQuestion = ({ target }) => {
     const { clock } = this.state;
-    this.randomTrue();
+    const { dispatch } = this.props;
     this.setState({ verified: true, disableBtns: true });
     clearInterval(clock);
+    if (target.value === 'correct-answer') {
+      const placar = this.somaPlacar();
+      dispatch(addPlacar(placar));
+    }
   };
 
   render() {
@@ -120,12 +127,12 @@ class Play extends Component {
             <h3 data-testid="question-text">{perguntas[indexQuestao].question}</h3>
             <div data-testid="answer-options">
               {
-                this.randomArray(perguntas, indexQuestao).map((elem, index) => (
+                perguntas[indexQuestao].respostas.map((elem, index) => (
                   (elem === perguntas[indexQuestao].correct_answer)
                     ? (
                       <button
                         data-testid="correct-answer"
-                        key={ index }
+                        key={ elem }
                         type="button"
                         onClick={ this.clickQuestion }
                         value="correct-answer"
@@ -139,7 +146,7 @@ class Play extends Component {
                     : (
                       <button
                         data-testid={ `wrong-answer-${index}` }
-                        key={ index }
+                        key={ elem }
                         type="button"
                         onClick={ this.clickQuestion }
                         value="wrong-answer"
@@ -161,6 +168,7 @@ class Play extends Component {
 }
 
 Play.propTypes = {
+  dispatch: PropTypes.func.isRequired,
   history: PropTypes.shape({
     push: PropTypes.func.isRequired,
   }).isRequired,
