@@ -5,21 +5,23 @@ import PropTypes from 'prop-types';
 import Header from '../components/Header';
 import { addPlacar } from '../redux/actions';
 
-const GAME_TIME = 30;
 const ONE_SECOND = 1000;
+const GAME_TIME = 30;
 const PONTO_CONSTANTE = 10;
+const LAST_QUESTION_INDEX = 4;
 const HARD = 3;
 const MEDIUM = 2;
 const EASY = 1;
 
-class Play extends Component {
+class Game extends Component {
   state = {
     indexQuestao: 0,
     perguntas: [],
-    verified: false,
+    // verified: false,
     time: GAME_TIME,
     clock: 0,
-    disableBtns: false,
+    // disableBtns: false,
+    questionAnswered: false,
   };
 
   async componentDidMount() {
@@ -37,7 +39,8 @@ class Play extends Component {
         this.setState({ time });
       }
       if (time <= 0) {
-        this.setState({ verified: true, disableBtns: true });
+        // this.setState({ verified: true, disableBtns: true });
+        this.setState({ questionAnswered: true });
         clearInterval(clock);
       }
     }, ONE_SECOND);
@@ -57,7 +60,7 @@ class Play extends Component {
       resposta.results.forEach((question) => {
         question.respostas = this.randomArray(question);
       });
-      console.log(resposta.results);
+      // console.log(resposta.results);
       this.setState({
         perguntas: resposta.results,
       });
@@ -107,7 +110,8 @@ class Play extends Component {
   clickQuestion = ({ target }) => {
     const { clock } = this.state;
     const { dispatch } = this.props;
-    this.setState({ verified: true, disableBtns: true });
+    // this.setState({ verified: true, disableBtns: true });
+    this.setState({ questionAnswered: true });
     clearInterval(clock);
     if (target.value === 'correct-answer') {
       const placar = this.somaPlacar();
@@ -115,8 +119,22 @@ class Play extends Component {
     }
   };
 
+  clickNext = () => {
+    const { indexQuestao } = this.state;
+    const { history } = this.props;
+    if (indexQuestao === LAST_QUESTION_INDEX) {
+      history.push('/feedback');
+    }
+    this.setState((prevState) => ({
+      indexQuestao: prevState.indexQuestao + 1,
+      questionAnswered: false,
+      time: GAME_TIME,
+    }));
+    this.createTimer();
+  };
+
   render() {
-    const { indexQuestao, perguntas, verified, time, disableBtns } = this.state;
+    const { indexQuestao, perguntas, time, questionAnswered } = this.state;
     return (
       <div>
         <Header />
@@ -136,8 +154,8 @@ class Play extends Component {
                         type="button"
                         onClick={ this.clickQuestion }
                         value="correct-answer"
-                        disabled={ disableBtns }
-                        style={ verified ? {
+                        disabled={ questionAnswered }
+                        style={ questionAnswered ? {
                           border: '3px solid rgb(6, 240, 15)' } : {} }
                       >
                         {elem}
@@ -150,14 +168,25 @@ class Play extends Component {
                         type="button"
                         onClick={ this.clickQuestion }
                         value="wrong-answer"
-                        disabled={ disableBtns }
-                        style={ verified ? {
+                        disabled={ questionAnswered }
+                        style={ questionAnswered ? {
                           border: '3px solid red' } : {} }
                       >
                         {elem}
                       </button>
                     )
                 ))
+              }
+              {
+                questionAnswered && (
+                  <button
+                    type="button"
+                    data-testid="btn-next"
+                    onClick={ this.clickNext }
+                  >
+                    Next
+                  </button>
+                )
               }
             </div>
           </div>
@@ -167,11 +196,11 @@ class Play extends Component {
   }
 }
 
-Play.propTypes = {
+Game.propTypes = {
   dispatch: PropTypes.func.isRequired,
   history: PropTypes.shape({
     push: PropTypes.func.isRequired,
   }).isRequired,
 };
 
-export default connect()(Play);
+export default connect()(Game);

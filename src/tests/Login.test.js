@@ -22,7 +22,6 @@ describe('Testes pagina de login. Requisito 1 a 3', () => {
         expect(name).toBeInTheDocument();
         expect(email).toBeInTheDocument();
         
-        
         userEvent.type(email, emailTest);
         userEvent.type(name, nameTest);
         userEvent.click(btnPlay);
