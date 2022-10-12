@@ -18,7 +18,6 @@ class Play extends Component {
     perguntas: [],
     verified: false,
     time: GAME_TIME,
-    verifyRandom: true,
     clock: 0,
     disableBtns: false,
   };
@@ -29,26 +28,16 @@ class Play extends Component {
     this.createTimer();
   }
 
-  randomFalse = () => {
-    this.setState({ verifyRandom: false });
-  };
-
-  randomTrue = () => {
-    this.setState({ verifyRandom: true });
-  };
-
   createTimer = () => {
     const clock = setInterval(() => {
       this.setState({ clock });
       let { time } = this.state;
       if (time > 0) {
-        this.randomFalse();
         time -= 1;
         this.setState({ time });
       }
       if (time <= 0) {
         this.setState({ verified: true, disableBtns: true });
-        this.randomTrue();
         clearInterval(clock);
       }
     }, ONE_SECOND);
@@ -65,6 +54,10 @@ class Play extends Component {
         localStorage.removeItem('token');
         history.push('/');
       }
+      resposta.results.forEach((question) => {
+        question.respostas = this.randomArray(question);
+      });
+      console.log(resposta.results);
       this.setState({
         perguntas: resposta.results,
       });
@@ -77,8 +70,8 @@ class Play extends Component {
   // https://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
 
   shuffle = (array) => {
-    let currentIndex = array.length; let
-      randomIndex;
+    let currentIndex = array.length;
+    let randomIndex;
 
     // While there remain elements to shuffle.
     while (currentIndex !== 0) {
@@ -94,16 +87,8 @@ class Play extends Component {
     return array;
   };
 
-  randomArray = (perguntas, indexQuestao) => {
-    const { verifyRandom } = this.state;
-    if (verifyRandom) {
-      const random = this.shuffle([perguntas[indexQuestao].correct_answer,
-        ...perguntas[indexQuestao].incorrect_answers]);
-      return random;
-    }
-    return [perguntas[indexQuestao].correct_answer,
-      ...perguntas[indexQuestao].incorrect_answers];
-  };
+  randomArray = (pergunta) => this.shuffle([pergunta.correct_answer,
+    ...pergunta.incorrect_answers]);
 
   somaPlacar = () => {
     const { time, perguntas, indexQuestao } = this.state;
@@ -122,7 +107,6 @@ class Play extends Component {
   clickQuestion = ({ target }) => {
     const { clock } = this.state;
     const { dispatch } = this.props;
-    this.randomTrue();
     this.setState({ verified: true, disableBtns: true });
     clearInterval(clock);
     if (target.value === 'correct-answer') {
@@ -143,12 +127,12 @@ class Play extends Component {
             <h3 data-testid="question-text">{perguntas[indexQuestao].question}</h3>
             <div data-testid="answer-options">
               {
-                this.randomArray(perguntas, indexQuestao).map((elem, index) => (
+                perguntas[indexQuestao].respostas.map((elem, index) => (
                   (elem === perguntas[indexQuestao].correct_answer)
                     ? (
                       <button
                         data-testid="correct-answer"
-                        key={ index }
+                        key={ elem }
                         type="button"
                         onClick={ this.clickQuestion }
                         value="correct-answer"
@@ -162,7 +146,7 @@ class Play extends Component {
                     : (
                       <button
                         data-testid={ `wrong-answer-${index}` }
-                        key={ index }
+                        key={ elem }
                         type="button"
                         onClick={ this.clickQuestion }
                         value="wrong-answer"

@@ -7,7 +7,7 @@ const INITIAL_STATE = {
   gravatarEmail: '', // email-da-pessoa,
 };
 
-const user = (state = INITIAL_STATE, action) => {
+const player = (state = INITIAL_STATE, action) => {
   switch (action.type) {
   case ADD_USER_INFO:
     return {
@@ -25,4 +25,4 @@ const user = (state = INITIAL_STATE, action) => {
   }
 };
 
-export default user;
+export default player;
