@@ -19,7 +19,7 @@ class Feedback extends Component {
     return (
       <section>
         <Header />
-        <h1>Feedback</h1>
+        <h1>Feedback!</h1>
         <span data-testid="feedback-text">{this.FeedbackMSG()}</span>
       </section>
     );
