@@ -16,6 +16,17 @@ class Feedback extends Component {
     }
   };
 
+  handleClick = () => {
+    const { email, nome, score } = this.props;
+    const getArray = JSON.parse(localStorage.getItem('player')) || [];
+    console.log(getArray);
+
+    const arrayInfo = { email, nome, score };
+    const arrayStorage = [...getArray, arrayInfo];
+
+    localStorage.setItem('player', JSON.stringify(arrayStorage));
+  };
+
   render() {
     const { acertos, score } = this.props;
     return (
@@ -29,7 +40,13 @@ class Feedback extends Component {
           <button type="button" data-testid="btn-play-again">Play Again</button>
         </Link>
         <Link to="/ranking">
-          <button type="button" data-testid="btn-ranking">Ranking</button>
+          <button
+            type="button"
+            data-testid="btn-ranking"
+            onClick={ this.handleClick }
+          >
+            Ranking
+          </button>
         </Link>
       </section>
     );
@@ -39,11 +56,15 @@ class Feedback extends Component {
 const mapStateToProps = (state) => ({
   acertos: state.player.assertions,
   score: state.player.score,
+  email: state.player.gravatarEmail,
+  nome: state.player.name,
 });
 
 Feedback.propTypes = {
   acertos: PropTypes.number.isRequired,
   score: PropTypes.number.isRequired,
+  email: PropTypes.string.isRequired,
+  nome: PropTypes.string.isRequired,
 };
 
 export default connect(mapStateToProps)(Feedback);
