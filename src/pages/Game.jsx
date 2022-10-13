@@ -127,8 +127,8 @@ class Game extends Component {
     const { indexQuestao, acertos } = this.state;
     const { dispatch, history } = this.props;
     if (indexQuestao === LAST_QUESTION_INDEX) {
-      history.push('/feedback');
       dispatch(addAcertos(acertos));
+      history.push('/feedback');
     }
     this.setState((prevState) => ({
       indexQuestao: prevState.indexQuestao + 1,
