@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
 import Header from '../components/Header';
-import { addPlacar } from '../redux/actions';
+import { addAcertos, addPlacar } from '../redux/actions';
 
 const ONE_SECOND = 1000;
 const GAME_TIME = 30;
@@ -22,6 +22,7 @@ class Game extends Component {
     clock: 0,
     // disableBtns: false,
     questionAnswered: false,
+    acertos: 0,
   };
 
   async componentDidMount() {
@@ -108,22 +109,26 @@ class Game extends Component {
   };
 
   clickQuestion = ({ target }) => {
-    const { clock } = this.state;
+    const { clock, acertos } = this.state;
     const { dispatch } = this.props;
     // this.setState({ verified: true, disableBtns: true });
     this.setState({ questionAnswered: true });
     clearInterval(clock);
     if (target.value === 'correct-answer') {
       const placar = this.somaPlacar();
+      this.setState({
+        acertos: acertos + 1,
+      });
       dispatch(addPlacar(placar));
     }
   };
 
   clickNext = () => {
-    const { indexQuestao } = this.state;
-    const { history } = this.props;
+    const { indexQuestao, acertos } = this.state;
+    const { dispatch, history } = this.props;
     if (indexQuestao === LAST_QUESTION_INDEX) {
       history.push('/feedback');
+      dispatch(addAcertos(acertos));
     }
     this.setState((prevState) => ({
       indexQuestao: prevState.indexQuestao + 1,
