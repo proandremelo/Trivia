@@ -1,8 +1,8 @@
-import { ADD_USER_INFO, ADD_SCORE } from '../actions/actionTypes';
+import { ADD_USER_INFO, ADD_SCORE, ADD_ACERTOS } from '../actions/actionTypes';
 
 const INITIAL_STATE = {
   name: '', // nome-da-pessoa,
-  assertions: '', // número-de-acertos,
+  assertions: 0, // número-de-acertos,
   score: 0, // pontuação,
   gravatarEmail: '', // email-da-pessoa,
 };
@@ -19,6 +19,11 @@ const player = (state = INITIAL_STATE, action) => {
     return {
       ...state,
       score: state.score + action.placar,
+    };
+  case ADD_ACERTOS:
+    return {
+      ...state,
+      assertions: state.assertions + action.acertos,
     };
   default:
     return state;
